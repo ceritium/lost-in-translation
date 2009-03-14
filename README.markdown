@@ -37,6 +37,7 @@ Fedback
 
 Se agradece todo el feedback posible, desde errores, casos de uso o posibles mejoras.
 
+* Blog: [http://ceritium.net/476/programacion/rails/lost-in-translation/](http://ceritium.net/476/programacion/rails/lost-in-translation/ 'Entrada en mi blog')
 * Correo: ceritium@gmail.com
 * **Fork Me!**
 
