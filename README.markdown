@@ -1,4 +1,4 @@
-LostInTranslation
+Lost In Translation
 ==========
 
 LostInTranslation es una pequeña clase que nos puede ayudar a mantener al día las traducciones en nuestras aplicaciones que tiren la API I18n de RAILS y que tengan como backend los ficheros yaml.
