@@ -16,10 +16,10 @@ También tienes otros métodos disponibles para configurar el idioma e incluso e
     i18n = LostInTranslation.new
     
     # Pone el español como el idioma de destino
-    i18n.set_locale('es')
+    i18n.locale = 'es'
     
     # Por si por ejemplo queremos almacenar las traducciónes en otro archivo, en este case será prueba_es.yaml
-    i18n.set_yaml('prueba_es')
+    i18n.yaml = 'prueba_es'
     
     i18n.save_translations
     
