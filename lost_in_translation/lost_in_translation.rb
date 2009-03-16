@@ -4,7 +4,7 @@ class LostInTranslation
   
   def initialize
     @locale = 'en'
-    @file = @locale
+    @file = "#{@locale}.yml"
     @translations = []
     @hash = {}
   end
@@ -12,15 +12,25 @@ class LostInTranslation
 
   # Definimos el nombre del fichero de traducciones con el queremos trabajar,
   # si no es especifica coje el yaml del mismo nombre de la loca definida
-  def set_yaml(file)
+  def yaml=(file)
     @file = file
   end
   
+  # Devuelve el nombre del fichero donde se salvarán las traducciones
+  def yaml
+    @file
+  end
   
   # Definimo el idioma al que queremos añadir las traducciones perdidas
-  def set_locale(locale)
+  def locale=(locale)
     @locale = I18n.locale = locale
   end
+  
+  # Devuelve el nombre de la locale con la que trabajaremos
+  def locale
+    @locale
+  end
+  
   
   # Escaneamos la carpeta app en busca de todas las cadenas 
   def scan_app
@@ -53,7 +63,7 @@ class LostInTranslation
   # Guarda en el .yml las nuevas traducciones encontradas
   def save_translations
     store_translations if @hash.blank?
-    File.open("config/locales/#{@file}.yml", "w") do |file|
+    File.open("config/locales/#{@file}", "w") do |file|
       file.puts @hash.to_yaml
     end
   end
