@@ -1,83 +1,59 @@
+require 'pathname'
+
 class LostInTranslation
   # Expresión regular para recoger todas las cadenas de traducción de la aplicación
   MATCH = /\b(?:I18n\.t|I18n\.translate|t)(?:\s|\():?'([a-z0-9_]+.[a-z0-9_.]+)'\)?/
+
+  attr_accessor :file, :locale, :path
   
   def initialize
     @locale = 'en'
-    @file = "#{@locale}.yml"
+    @file = "config/locales/#{@locale}.yml"
     @translations = []
     @hash = {}
+    @path = 'app/'
   end
 
-
-  # Definimos el nombre del fichero de traducciones con el queremos trabajar,
-  # si no es especifica coje el yaml del mismo nombre de la loca definida
-  def yaml=(file)
-    @file = file
-  end
-  
-  # Devuelve el nombre del fichero donde se salvarán las traducciones
-  def yaml
-    @file
-  end
-  
-  # Definimo el idioma al que queremos añadir las traducciones perdidas
-  def locale=(locale)
-    @locale = I18n.locale = locale
-  end
-  
-  # Devuelve el nombre de la locale con la que trabajaremos
-  def locale
-    @locale
-  end
-  
-  
-  # Escaneamos la carpeta app en busca de todas las cadenas 
-  def scan_app
+  # Escaneamos la carpeta en busca de todas las cadenas coincidentes con la expresión regular
+  def scan
     @translations = []
-    Pathname.new('app/').find do |path|
+    Pathname.new(@path).find do |path|
       if can_open?(path)
         read_file(path)
       end
     end
-    @translations.flatten
+    @translations.flatten!
   end
   
-  
-  # Almacena en memoria usando la api i18n de Rails todas las traducciones,
-  # y lo devuelve como un hash
-  def store_translations
-    keys = exists_keys
-    extract_i18n_keys(I18n.backend.send(:translations)[@locale.to_sym]).sort
-    scan_app if @translations.blank?
+  def store
+    scan if @translations.empty?
     @translations.each do |translation|
-      translation =  to_deep_hash({translation.to_s => nil})
-      I18n.backend.store_translations(@locale.to_sym, translation)
+      key_value = to_deep_hash({translation => nil})
+      translation = deep_symbolize_keys(key_value)
+      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+      @hash.merge!(translation, &merger)
     end
-    # Stringifying keys for prettier YAML
-    @hash = deep_stringify_keys({
-      @locale => I18n.backend.send(:translations)[@locale.to_sym]
-    })
+    @hash = deep_stringify_keys({@locale  => @hash})
   end
   
   # Guarda en el .yml las nuevas traducciones encontradas
-  def save_translations
-    store_translations if @hash.blank?
-    File.open("config/locales/#{@file}", "w") do |file|
+  def save
+    store if @hash.empty?
+    File.open(@file, "w") do |file|
       file.puts @hash.to_yaml
     end
   end
 
   
-  # Mostramos las traducciones existentes en el archivo de traducción configurado
-  # FIXME: Si el archivo .yml no tiene almenos una traducción falla
-  def exists_keys
-    I18n.backend.send(:init_translations) unless I18n.backend.initialized?
-    extract_i18n_keys(I18n.backend.send(:translations)[@locale.to_sym]).sort
-  end
-  
-  
   private
+  
+  def deep_symbolize_keys(hash)
+    hash.inject({}) { |result, (key, value)|
+      value = deep_symbolize_keys(value) if value.is_a? Hash
+      result[(key.to_sym rescue key) || key] = value
+      result
+    }
+  end
   
   def to_deep_hash(hash)    
     hash.inject({}) do |deep_hash, (key, value)|
@@ -88,6 +64,7 @@ class LostInTranslation
       deep_hash
     end
   end
+  
   def deep_merge!(hash1, hash2)
     merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
     hash1.merge!(hash2, &merger)
@@ -137,5 +114,6 @@ class LostInTranslation
       @translations << match
     end
   end
+  
 end
 

@@ -7,6 +7,6 @@ namespace :i18n do
   desc 'Tarea que busca y añade todas las cadenas del tipo t() al archivo de traducción es.yml'
   task(:lost_in_translation => :environment) do
     i18n = LostInTranslation.new
-    i18n.save_translations
+    i18n.save
   end
 end
