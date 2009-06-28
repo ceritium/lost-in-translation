@@ -1,5 +1,3 @@
-require 'pathname'
-
 class LostInTranslation
   # Expresión regular para recoger todas las cadenas de traducción de la aplicación
   MATCH = /\b(?:I18n\.t|I18n\.translate|t)(?:\s|\():?'([a-z0-9_]+.[a-z0-9_.]+)'\)?/
