@@ -35,9 +35,9 @@ También tienes otros métodos disponibles para configurar el idioma o el archiv
 
 == TODO
 
-  Tests
-  Añadir a varios idiomas a la vez
-  Traducir
+- Tests
+- Añadir a varios idiomas a la vez
+- Traducir
 
 == Fedback
 
