@@ -12,10 +12,10 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc         = true
   s.extra_rdoc_files = %w(README.rdoc)
   s.rdoc_options     = %w(--main README.rdoc)
-  s.summary          = "This gem does ... "
-  s.author           = 'First Last'
-  s.email            = 'user@example.com'
-  s.homepage         = 'http://my-site.net'
+  s.summary          = "Encuentra todas las traducciones de la API I18n de rails y las guarda en yaml"
+  s.author           = 'Jose Galisteo'
+  s.email            = 'ceritium@gmail.com'
+  s.homepage         = 'http://ceritium.net'
   s.files            = %w(README.rdoc Rakefile) + Dir.glob("{lib,test}/**/*")
   # s.executables    = ['lost-in-translation']
   

@@ -8,8 +8,12 @@ class LostInTranslation
     @locale = 'en'
     @file = "config/locales/#{@locale}.yml"
     @translations = []
-    @hash = {}
-    @path = 'app/'
+    @path = 'app'
+    @sth = StringToHash.new
+  end
+  
+  def hash
+    @sth.hash
   end
 
   # Escaneamos la carpeta en busca de todas las cadenas coincidentes con la expresión regular
@@ -26,55 +30,21 @@ class LostInTranslation
   def store
     scan if @translations.empty?
     @translations.each do |translation|
-      key_value = to_deep_hash({translation => nil})
-      translation = deep_symbolize_keys(key_value)
-      merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-      @hash.merge!(translation, &merger)
+      @sth.add(translation)
     end
-    @hash = deep_stringify_keys({@locale  => @hash})
+    @sth.add_prefix(@locale)
   end
   
   # Guarda en el .yml las nuevas traducciones encontradas
   def save
-    store if @hash.empty?
+    store if hash.empty?
     File.open(@file, "w") do |file|
-      file.puts @hash.to_yaml
+      file.puts hash.to_yaml
     end
   end
 
   
   private
-  
-  def deep_symbolize_keys(hash)
-    hash.inject({}) { |result, (key, value)|
-      value = deep_symbolize_keys(value) if value.is_a? Hash
-      result[(key.to_sym rescue key) || key] = value
-      result
-    }
-  end
-  
-  def to_deep_hash(hash)    
-    hash.inject({}) do |deep_hash, (key, value)|
-      keys = key.split('.').reverse
-      leaf_key = keys.shift
-      key_hash = keys.inject({leaf_key.to_sym => value}) { |hash, key| {key.to_sym => hash} }
-      deep_merge!(deep_hash, key_hash)
-      deep_hash
-    end
-  end
-  
-  def deep_merge!(hash1, hash2)
-    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-    hash1.merge!(hash2, &merger)
-  end
-  
-  def deep_stringify_keys(hash)
-    hash.inject({}) { |result, (key, value)|
-      value = deep_stringify_keys(value) if value.is_a? Hash
-      result[(key.to_s rescue key) || key] = value
-      result
-    }
-  end
   
   # Convertimos el hash que le pasemos a un array
   # NOTA: Este método está sacado del plugin translate
@@ -114,4 +84,3 @@ class LostInTranslation
   end
   
 end
-

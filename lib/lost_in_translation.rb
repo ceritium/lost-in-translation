@@ -2,4 +2,4 @@
 
 require 'pathname'
 require 'lost_in_translation/lost_in_translation'
-
+require 'lost_in_translation/string_to_hash'
